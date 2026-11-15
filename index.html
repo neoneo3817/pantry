@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>라니의 살림살이</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<style>
+:root{--bg:#ece9e4;--bg2:#f3f1ed;--ink:#2e2620;--mut:#8a8278;--y:#fdb827;--br:#6f4437;--pk:#f4d4cc;color-scheme:light}
+*,*::before,*::after{box-sizing:border-box}
+html,body{margin:0;height:100%;overflow:hidden}
+body{background:radial-gradient(900px 600px at 50% 38%,#f8f5f0,var(--bg) 70%);font-family:"Plus Jakarta Sans","Noto Sans KR",system-ui,sans-serif;color:var(--ink);-webkit-font-smoothing:antialiased}
+#cv{position:fixed;inset:0;width:100%;height:100%;display:block}
+button{font-family:inherit;color:inherit;cursor:pointer}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--y);outline-offset:2px}
+.top{position:fixed;top:0;left:0;right:0;padding:calc(env(safe-area-inset-top,0px) + 18px) 20px 0;pointer-events:none;text-align:center}
+.top small{color:var(--mut);font-size:14px;font-weight:500}
+.top h1{margin:2px 0 0;font-size:28px;font-weight:800;letter-spacing:-.02em}
+.qt{pointer-events:auto;margin:12px auto 0;display:block;max-width:100%;background:var(--y);color:#3d2a14;border:0;border-radius:20px;padding:10px 16px;font-size:14px;font-weight:600;text-align:center;line-height:1.4}
+.tg{position:fixed;transform:translate(-50%,-100%);pointer-events:none}
+.tg b{display:grid;place-items:center;min-width:26px;height:26px;padding:0 7px;border-radius:13px;background:var(--y);color:#3d2a14;font-size:13px;font-weight:800;box-shadow:0 4px 10px rgba(80,60,30,.25)}
+#tray{position:fixed;left:0;right:0;bottom:calc(env(safe-area-inset-bottom,0px) + 106px);display:flex;gap:12px;justify-content:center;overflow-x:auto;padding:6px 16px}
+.chip{flex:none;display:flex;flex-direction:column;align-items:center;gap:6px;background:none;border:0;padding:0}
+.chip .ci{width:56px;height:56px;border-radius:50%;background:#fff;display:grid;place-items:center;box-shadow:0 6px 16px rgba(80,60,30,.12)}
+.chip .ci svg{width:38px;height:38px}
+.dd{background:var(--y);color:#3d2a14;border-radius:999px;padding:2px 10px;font-size:12px;font-weight:800}
+.dd.x{background:#e9a89b;color:#5a2a20}
+#nav{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 14px);transform:translateX(-50%);width:min(520px,calc(100% - 24px));background:#fff;border-radius:32px;padding:12px 10px 10px;display:grid;grid-template-columns:repeat(3,2fr) 70px repeat(2,3fr);align-items:end;box-shadow:0 10px 30px rgba(80,60,30,.14)}
+.nb{background:none;border:0;display:flex;flex-direction:column;align-items:center;gap:3px;color:var(--mut);font-size:11px;font-weight:600;position:relative}
+.nb svg{width:24px;height:24px}
+.bd{position:absolute;top:-6px;left:calc(50% + 6px);min-width:18px;height:18px;border-radius:9px;background:var(--y);color:#3d2a14;font-size:11px;font-weight:800;display:grid;place-items:center;padding:0 4px}
+.plus{width:58px;height:58px;border-radius:50%;border:0;background:var(--y);color:#3d2a14;font-size:32px;font-weight:300;margin-top:-30px;box-shadow:0 10px 24px rgba(253,184,39,.5);justify-self:center;line-height:1}
+#ov{position:fixed;inset:0;background:rgba(46,38,32,.4);display:flex;align-items:flex-end;justify-content:center;z-index:5}
+#ov[hidden]{display:none}
+.sheet{width:min(600px,100%);max-height:90vh;overflow-y:auto;background:var(--bg2);border-radius:32px 32px 0 0;padding:20px 18px calc(env(safe-area-inset-bottom,0px) + 22px)}
+.sh{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+.sh h2{margin:0;font-size:24px;font-weight:800}
+.cl{width:42px;height:42px;border-radius:50%;border:0;background:#fff;display:grid;place-items:center}
+.segs{display:flex;gap:8px;overflow-x:auto;margin-bottom:14px}
+.seg{border:0;background:#fff;border-radius:999px;padding:8px 16px;font-size:14px;font-weight:600;color:var(--mut);flex:none}
+.seg[aria-pressed=true]{background:var(--y);color:#3d2a14}
+.tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(104px,1fr));gap:12px}
+.tile{position:relative;background:#fff;border:0;border-radius:24px;padding:14px 8px 12px;display:flex;flex-direction:column;align-items:center;gap:8px;min-width:0}
+.tile .ic{width:68px;height:68px;border-radius:22px;background:var(--p);display:grid;place-items:center}
+.tile .ic svg{width:50px;height:50px}
+.tile .nm{font-size:13px;font-weight:600;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.qy{position:absolute;top:8px;right:8px;min-width:26px;height:26px;border-radius:13px;background:var(--y);color:#3d2a14;font-size:13px;font-weight:800;display:grid;place-items:center;padding:0 7px}
+.qy.z{background:#e9a89b;color:#5a2a20}
+.tile .dd{position:absolute;top:8px;left:8px;background:var(--pk);color:var(--br)}
+.tile .dd.x{background:#e9a89b;color:#5a2a20}
+.cta{width:100%;margin-top:16px;border:0;border-radius:999px;background:var(--y);color:#3d2a14;font-size:16px;font-weight:800;padding:16px}
+.emp{display:grid;place-items:center;padding:30px}.emp svg{width:84px;height:84px}
+.big{text-align:center;font-size:64px;font-weight:800;letter-spacing:-.03em;line-height:1.1}
+.cap-t{text-align:center;color:var(--mut);font-size:14px;margin-bottom:14px}
+.wh{background:#fff;border-radius:28px;padding:18px 12px}
+.caps{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+.cap{display:flex;flex-direction:column;align-items:center;gap:8px;font-size:12px;font-weight:600;color:var(--mut)}
+.trk{width:100%;max-width:60px;height:200px;border-radius:30px;background:#f1efeb;display:flex;align-items:flex-end}
+.trk i{display:flex;align-items:flex-end;justify-content:center;width:100%;border-radius:30px;padding-bottom:12px;font-style:normal;font-size:12px;font-weight:700}
+.pers{display:flex;align-items:center;gap:10px;background:#fff;border-radius:22px;padding:12px 16px;margin-top:12px;font-weight:800;font-size:17px}
+.pers svg{width:40px;height:40px}
+.rowt{display:flex;gap:10px;margin-top:12px}.rowt .tile{flex:1}
+dialog{border:0;border-radius:28px;padding:22px;width:min(400px,92vw);background:var(--bg2);color:var(--ink);font-family:inherit;box-shadow:0 20px 60px rgba(46,38,32,.3)}
+dialog::backdrop{background:rgba(46,38,32,.4)}
+dialog label{display:block;font-size:13px;font-weight:600;color:var(--mut);margin:12px 0 6px}
+dialog input,dialog select{width:100%;border:0;border-radius:16px;background:#fff;padding:13px 14px;font-family:inherit;font-size:15px;font-weight:600;color:var(--ink)}
+.step{display:flex;justify-content:center;align-items:center;gap:22px;margin:4px 0 8px;font-size:38px;font-weight:800}
+.step button{width:44px;height:44px;border-radius:50%;border:0;background:#fff;font-size:22px;font-weight:600}
+.drow{display:flex;justify-content:space-between;margin-top:14px}
+.tbtn{background:none;border:0;font-size:14px;font-weight:700;color:var(--mut);padding:8px 4px}
+.gh{margin:18px 4px 8px;font-size:15px;font-weight:800;color:var(--mut)}
+#libBtn{position:fixed;z-index:2;top:calc(env(safe-area-inset-top,0px) + 14px);right:14px;width:48px;height:48px;padding:0;border:0;border-radius:50%;background:none;filter:drop-shadow(0 4px 8px rgba(80,60,30,.22))}
+#libBtn svg{width:100%;height:100%;display:block}
+#libBtn:active{transform:scale(.94)}
+</style>
+</head>
+<body>
+<canvas id="cv"></canvas>
+<div class="top"><small id="dateTx"></small><h1>라니의 살림살이</h1><button class="qt" id="qt" aria-label="다른 문구 보기"></button></div>
+<button id="libBtn" aria-label="아이콘 도감 열기"></button>
+<div class="tg" id="tgF"></div><div class="tg" id="tgP"></div><div class="tg" id="tgS"></div>
+<div id="tray"></div>
+<nav id="nav">
+<button class="nb" data-nav="fridge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="2.5" width="12" height="19" rx="3"/><path d="M6 10h12M9 6v2M9 13v3"/></svg>냉장고<b class="bd" id="bF"></b></button>
+<button class="nb" data-nav="pantry"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M12 3v18M4 13h16M10 8v1M14 8v1"/></svg>식료품<b class="bd" id="bP"></b></button>
+<button class="nb" data-nav="supply"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10 3.5h4.5M12.5 3.5V7"/><path d="M7 12a3 3 0 0 1 3-3h5a3 3 0 0 1 3 3v6.5a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2z"/><path d="M7 14.5h11"/></svg>생필품<b class="bd" id="bS"></b></button>
+<button class="plus" id="addBtn" aria-label="물건 추가">+</button>
+<button class="nb" data-nav="buy"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 4h2.5l2 11h10l2-8H7"/><circle cx="9" cy="19.5" r="1.3"/><circle cx="17" cy="19.5" r="1.3"/></svg>장보기<b class="bd" id="bB"></b></button>
+<button class="nb" data-nav="stat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 20V11M12 20V4M19 20v-6"/></svg>통계</button>
+</nav>
+<div id="ov" hidden></div>
+
+<dialog id="dlg">
+  <div class="step"><button id="sDec" type="button" aria-label="하나 줄이기">−</button><span id="sQty">1</span><button id="sInc" type="button" aria-label="하나 늘리기">+</button></div>
+  <label for="fName">이름</label><input id="fName" maxlength="20">
+  <label for="fCat">칸</label><select id="fCat"></select>
+  <label for="fShape">모양</label><select id="fShape"></select>
+  <label for="fMin">구매 기준 수량</label><input id="fMin" type="number" min="0">
+  <label for="fExp">유통기한</label><input id="fExp" type="date">
+  <button class="cta" id="dSave" type="button">저장</button>
+  <div class="drow"><button class="tbtn" id="dDel" type="button">삭제</button><button class="tbtn" id="dBuy" type="button">구매 완료</button><button class="tbtn" id="dCancel" type="button">닫기</button></div>
+</dialog>
+
+<script>
+/* ---------- data ---------- */
+const CATS=["냉장","냉동","식료품","생필품","청소용품"],CI={"냉장":"🧊","냉동":"❄️","식료품":"🍚","생필품":"🧻","청소용품":"🧼"},CC={"냉장":"#9fd3f0","냉동":"#cfc8f3","식료품":"#f7d57f","생필품":"#f4abc0","청소용품":"#aadfb3"};
+const hash=s=>[...s].reduce((a,c)=>(a*31+c.charCodeAt(0))>>>0,7);
+const QUOTES=["오늘의 당신은 어제보다 조금 더 단단해요.","잘 먹고 잘 자는 일이 가장 큰 용기예요.","천천히 가도 괜찮아요.","오늘은 나에게 다정한 사람이 되어 주세요.","애쓴 날엔 따뜻한 물 한 잔부터.","좋은 하루는 좋은 한 끼에서 시작돼요."];
+const d0=n=>{const d=new Date();d.setHours(0,0,0,0);d.setDate(d.getDate()+n);return d.toISOString().slice(0,10)};
+const SEED=[["우유","냉장",1,1,d0(2)],["달걀","냉장",6,1,d0(9)],["두부","냉장",0,1,d0(-1)],["요거트","냉장",3,1,d0(4)],["쌈채소","냉장",1,1,d0(1)],["만두","냉동",2,1,d0(120)],["냉동 블루베리","냉동",0,1,d0(200)],["식빵","식료품",1,1,d0(3)],["쌀","식료품",1,1,null],["라면","식료품",4,1,d0(150)],["올리브유","식료품",1,1,d0(240)],["커피 원두","식료품",0,1,d0(60)],["휴지","생필품",6,1,null],["칫솔","생필품",1,1,null],["샴푸","생필품",0,1,null],["주방세제","청소용품",1,1,null],["섬유유연제","청소용품",0,1,null],["욕실 클리너","청소용품",1,1,null]];
+const SEEDLOG=[["우유",14],["우유",7],["우유",0],["달걀",12],["달걀",4],["두부",9],["두부",2],["요거트",10],["요거트",3],["쌈채소",8],["식빵",13],["식빵",6],["커피 원두",30],["라면",40],["휴지",25],["샴푸",60],["섬유유연제",75],["쌀",50],["올리브유",80],["욕실 클리너",70]];
+let S;try{S=JSON.parse(localStorage.getItem("pantry-v1")||"null")}catch(e){S=null}
+if(!S){S={items:SEED.map((a,i)=>({id:i+1,name:a[0],cat:a[1],qty:a[2],min:a[3],exp:a[4]})),log:SEEDLOG.map(a=>({name:a[0],cat:SEED.find(s=>s[0]===a[0])[1],date:d0(-a[1])})),next:100,q:0}}
+const save=()=>{try{localStorage.setItem("pantry-v1",JSON.stringify(S))}catch(e){}};
+const $=id=>document.getElementById(id);let editId=null,dq=1,cur=null;
+const UNITS={fridge:{t:"냉장고",cs:["냉장","냉동"]},pantry:{t:"식료품",cs:["식료품"]},supply:{t:"생필품/청소용품",cs:["생필품","청소용품"]}};
+const days=e=>e?Math.round((new Date(e)-new Date(d0(0)))/864e5):null;
+const esc=s=>s.replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const isTidy=i=>{const n=days(i.exp);return n!==null&&n<=3&&i.qty>0};
+const isBuy=i=>i.qty<i.min;
+/* ---------- icons (kawaii) ---------- */
+const SK="#7a5a44",FC="#5b4030",PAL=["#ffc9a0","#f28b82","#b9a3e3","#a8d672","#ffe08a","#9fd3c7","#f4b8c8","#d9b99b"];
+const CP={"냉장":"#dfe7c5","냉동":"#dcd5f6","식료품":"#ffe7a3","생필품":"#f4d4cc","청소용품":"#e5dfd0"};
+const CAPC={"냉장":"#86a02a","냉동":"#7b7566","식료품":"#fdb827","생필품":"#e9a89b","청소용품":"#6f4437"},CAPT={"식료품":"#3d2a14","생필품":"#5a2a20"};
+const SHL={bottle:"병",tube:"튜브",box:"상자",cup:"컵",egg:"달걀형",leaf:"잎채소",loaf:"빵",bowl:"그릇",roll:"롤",round:"과일",dumpling:"만두",bag:"봉지",stick:"막대",carton:"우유팩",berry:"베리",cheese:"치즈",tortilla:"또띠아",potato:"감자",paprika:"파프리카",apple:"사과",citrus:"자몽",garlic:"마늘",butter:"버터",tub:"통(뚜껑)",jar:"잼병",squeeze:"짜는 병",can:"캔",pad:"패드",jug:"손잡이통",pump:"펌프병",scrub:"수세미",sponge:"스펀지",soap:"비누",pot:"크림통",tissue:"각티슈",wipes:"물티슈",rice:"즉석밥",chicken:"닭고기",strawb:"딸기",banana:"바나나",fish:"생선",tint:"틴트"};
+const SHP={
+bottle:["<rect x='25' y='5' width='14' height='8' rx='3' fill='#f3e9d8'/><path d='M26 13h12v6q10 4 10 14v18q0 8-8 8H24q-8 0-8-8V33q0-10 10-14z' fill='@'/>",32,42],
+tube:["<rect x='27' y='4' width='10' height='9' rx='3' fill='#f3e9d8'/><path d='M23 13h18q9 14 8 38 0 8-8 8H23q-8 0-8-8-1-24 8-38z' fill='@'/>",32,42],
+box:["<rect x='10' y='14' width='44' height='38' rx='10' fill='@'/>",32,35],
+cup:["<path d='M12 18h40l-4 34q-1 6-7 6H23q-6 0-7-6z' fill='@'/><rect x='10' y='12' width='44' height='9' rx='4.5' fill='#f3e9d8'/>",32,40],
+egg:["<path d='M32 6c12 0 20 18 20 30 0 11-9 20-20 20S12 47 12 36C12 24 20 6 32 6z' fill='@'/>",32,38],
+leaf:["<path d='M32 8c14 0 24 10 24 24 0 14-10 24-24 24S8 46 8 32C8 18 18 8 32 8z' fill='@'/><path d='M32 12v10M22 15l5 8M42 15l-5 8' fill='none'/>",32,38],
+loaf:["<path d='M10 28q0-14 14-14 4-4 8-4t8 4q14 0 14 14 0 4-3 6v14q0 6-6 6H19q-6 0-6-6V34q-3-2-3-6z' fill='@'/>",32,40],
+bowl:["<path d='M8 30h48q0 22-24 24Q8 52 8 30z' fill='@'/><path d='M24 22q-3-5 0-9M34 22q-3-5 0-9' fill='none'/>",32,40],
+roll:["<path d='M12 18v28q0 8 20 8t20-8V18z' fill='@'/><ellipse cx='32' cy='18' rx='20' ry='8' fill='#fff8ea'/><ellipse cx='32' cy='18' rx='6' ry='2.5' fill='#d9cdb8'/>",32,42],
+round:["<circle cx='32' cy='36' r='22' fill='@'/><path d='M32 14q-2-6 5-8' fill='none'/>",32,38],
+dumpling:["<path d='M8 40q0-22 24-22t24 22q0 10-24 10T8 40z' fill='@'/><path d='M20 23l3 6M32 20v7M44 23l-3 6' fill='none'/>",32,41],
+bag:["<path d='M16 14h32l4 40q0 4-4 4H16q-4 0-4-4z' fill='@'/><path d='M16 14q16 8 32 0' fill='none'/>",32,42],
+stick:["<g transform='rotate(35 32 32)'><rect x='26' y='6' width='12' height='52' rx='6' fill='@'/><rect x='24' y='6' width='16' height='13' rx='4' fill='#fff8ea'/></g>",32,38],
+carton:["<path d='M16 24h32v31q0 4-4 4H20q-4 0-4-4z' fill='@'/><path d='M16 24l7-14h18l7 14z' fill='#e3edf7'/>",32,43],
+berry:["<circle cx='32' cy='37' r='21' fill='@'/><path d='M25 16l7 5 7-5-1 8h-12z' fill='#6a6ac4'/>",32,41],
+cheese:["<path d='M6 28L58 14V48q0 6-6 6H12q-6 0-6-6z' fill='@'/><circle cx='49' cy='28' r='3.2' fill='#f0c25a'/><circle cx='12' cy='44' r='2.6' fill='#f0c25a'/><circle cx='47' cy='45' r='2.4' fill='#f0c25a'/>",30,41],
+tortilla:["<path d='M7 36v5q0 12 25 12t25-12v-5z' fill='@'/><ellipse cx='32' cy='36' rx='25' ry='16' fill='@'/><g fill='#d9a05b' stroke='none'><circle cx='21' cy='27' r='1.6'/><circle cx='43' cy='27' r='1.6'/><circle cx='14' cy='38' r='1.6'/><circle cx='50' cy='38' r='1.6'/><circle cx='32' cy='47' r='1.6'/></g>",32,36],
+potato:["<path d='M13 32q-2-14 14-17 15-3 23 8 8 12 0 24-6 10-20 10-14 0-17-14-1-5 0-11z' fill='@'/><g fill='#b8905f' stroke='none'><circle cx='22' cy='25' r='1.5'/><circle cx='43' cy='24' r='1.5'/><circle cx='46' cy='45' r='1.5'/><circle cx='21' cy='49' r='1.5'/></g>",31,38],
+paprika:["<path d='M32 15q-17 0-19 18-1 12 6 20 5 5 13 5t13-5q7-8 6-20-2-18-19-18z' fill='@'/><path d='M20 21q-5 12 0 28M44 21q5 12 0 28' fill='none' stroke-width='1.3'/><path d='M32 15v-4q0-4 5-5' fill='none'/>",32,40],
+apple:["<path d='M32 16C26 11 12 14 12 32c0 12 8 24 16 24 3 0 3-1 4-1s1 1 4 1c8 0 16-12 16-24 0-18-14-21-20-16z' fill='@'/><path d='M32 17q0-6 2-10' fill='none'/><path d='M35 10q6-6 13-1-6 6-13 1z' fill='#8fcf6a'/>",32,38],
+citrus:["<circle cx='32' cy='36' r='22' fill='#fff1d6'/><circle cx='32' cy='36' r='18' fill='@'/><path d='M32 19v5M32 53v-5M15 36h5M49 36h-5M20 24l3 3M44 24l-3 3M20 48l3-3M44 48l-3-3' fill='none' stroke-width='1.2'/>",32,36],
+garlic:["<path d='M32 8q-3 8-10 12-10 6-10 20 0 12 20 16 20-4 20-16 0-14-10-20-7-4-10-12z' fill='@'/><path d='M24 24q-7 12-4 26M40 24q7 12 4 26' fill='none' stroke-width='1.2'/>",32,40],
+butter:["<path d='M10 28L18 16h38L48 28z' fill='#fff3b8'/><path d='M48 28L56 16v28l-8 10z' fill='#f2d45e'/><rect x='10' y='28' width='38' height='26' rx='4' fill='@'/>",29,41],
+tub:["<path d='M10 25h44l-3 29q-1 4-5 4H18q-4 0-5-4z' fill='@'/><rect x='8' y='15' width='48' height='12' rx='6' fill='#f3e9d8'/>",32,43],
+jar:["<rect x='18' y='7' width='28' height='10' rx='3.5' fill='#f3e9d8'/><path d='M16 17h32q6 4 6 12v20q0 8-8 8H18q-8 0-8-8V29q0-8 6-12z' fill='@'/>",32,40],
+squeeze:["<path d='M29 3h6l3 11H26z' fill='#f3e9d8'/><path d='M24 14h16q10 6 10 18v18q0 8-8 8H22q-8 0-8-8V32q0-12 10-18z' fill='@'/>",32,43],
+can:["<rect x='14' y='13' width='36' height='44' rx='9' fill='@'/><rect x='12' y='9' width='40' height='10' rx='5' fill='#e8e0d0'/>",32,39],
+pad:["<rect x='6' y='22' width='52' height='28' rx='14' fill='@'/><rect x='12' y='27' width='40' height='18' rx='9' fill='#fff3f6' stroke='none'/>",32,36],
+jug:["<path d='M44 24q12 0 12 10t-12 10' fill='none'/><rect x='18' y='6' width='14' height='10' rx='3' fill='#f3e9d8'/><path d='M18 16h18l10 8v32q0 4-4 4H18q-4 0-4-4V20q0-4 4-4z' fill='@'/>",30,40],
+pump:["<path d='M32 17v-8q0-3 3-3h8' fill='none' stroke-width='3'/><rect x='26' y='14' width='12' height='6' rx='2' fill='#f3e9d8'/><path d='M22 20h20q8 4 8 14v18q0 6-6 6H20q-6 0-6-6V34q0-10 8-14z' fill='@'/>",32,43],
+scrub:["<rect x='8' y='20' width='48' height='32' rx='13' fill='@'/><g fill='#6fa84a' stroke='none'><circle cx='16' cy='28' r='1.3'/><circle cx='25' cy='25' r='1.3'/><circle cx='39' cy='25' r='1.3'/><circle cx='48' cy='28' r='1.3'/><circle cx='14' cy='40' r='1.3'/><circle cx='50' cy='40' r='1.3'/><circle cx='20' cy='47' r='1.3'/><circle cx='44' cy='47' r='1.3'/></g>",32,38],
+sponge:["<rect x='8' y='20' width='48' height='34' rx='10' fill='@'/><path d='M8 34v-4q0-10 10-10h28q10 0 10 10v4z' fill='#8fcf6a'/>",32,44],
+soap:["<circle cx='20' cy='13' r='4' fill='#e6f6fb'/><circle cx='29' cy='8' r='3' fill='#e6f6fb'/><circle cx='42' cy='12' r='3.6' fill='#e6f6fb'/><rect x='8' y='20' width='48' height='34' rx='13' fill='@'/>",32,37],
+pot:["<rect x='10' y='28' width='44' height='28' rx='9' fill='@'/><rect x='8' y='15' width='48' height='15' rx='7' fill='#e8d08a'/>",32,43],
+tissue:["<path d='M22 32q0-14 8-18 2 6 7 4 5-2 8 4 1 5-1 10z' fill='#fffdf5'/><path d='M10 30h44v24q0 6-6 6H16q-6 0-6-6z' fill='@'/>",32,45],
+wipes:["<path d='M10 25q0-6 6-6h32q6 0 6 6v27q0 6-6 6H16q-6 0-6-6z' fill='@'/><rect x='21' y='9' width='22' height='12' rx='5' fill='#e8eef7'/>",32,41],
+rice:["<path d='M12 28h40l-4 26q-1 6-7 6H23q-6 0-7-6z' fill='@'/><path d='M12 28q0-13 20-13t20 13z' fill='#fffdf5'/>",32,43],
+chicken:["<path d='M9 38q0-18 18-22 14-3 25 6 8 8 4 20-6 14-22 14-12 0-19-6-6-4-6-12z' fill='@'/><path d='M40 24q6 2 8 8' fill='none' stroke-width='1.2'/>",31,38],
+strawb:["<path d='M10 26q2-9 12-9 6 0 10 4 4-4 10-4 10 0 12 9 0 12-22 30-22-18-22-30z' fill='@'/><path d='M23 17l9-6 9 6-9 4z' fill='#8fcf6a'/><g fill='#ffe9a8' stroke='none'><circle cx='16' cy='28' r='1.1'/><circle cx='48' cy='28' r='1.1'/><circle cx='28' cy='50' r='1.1'/><circle cx='36' cy='50' r='1.1'/></g>",32,36],
+banana:["<path d='M12 22Q32 60 52 22' fill='none' stroke='#7a5a44' stroke-width='23'/><path d='M12 22Q32 60 52 22' fill='none' stroke='@' stroke-width='19'/><circle cx='53' cy='14' r='3' fill='#8a6a3a' stroke='none'/>",32,41],
+fish:["<path d='M6 34Q16 16 34 18Q44 19 50 27L60 17V51L50 41Q44 50 34 50Q16 52 6 34z' fill='@'/><path d='M42 25q4 9 0 18' fill='none' stroke-width='1.2'/>",26,36],
+tint:["<rect x='27' y='4' width='10' height='15' rx='4' fill='#f3e9d8'/><path d='M22 19h20q4 0 4 4v27q0 8-8 8H26q-8 0-8-8V23q0-4 4-4z' fill='@'/>",32,38]};
+const KW=[["크림치즈","tub","#fff4e6"],["생크림","carton","#fff1d0"],["피넛버터","jar","#d9a066"],["사과식초","bottle","#e8c27a"],["클렌징오일","pump","#f6d98a"],["폼클렌저","tube","#f7e3ef"],["주방물티슈","wipes","#d8efc9"],["물티슈","wipes","#d6ecf7"],["비데휴지","roll","#cfe8f5"],["미용티슈","tissue","#cfe6f5"],["키친타올","roll","#fff0c8"],["휴지","roll","#fffaf0"],["닭가슴살","chicken","#f7cdb9"],["딸기","strawb","#f2757a"],["바나나","banana","#ffe27a"],["파스타","bag","#f6d38a"],["생선","fish","#a9d4ef"],["바디샴푸","pump","#9fd3c7"],["바디비누","soap","#bfe6d6"],["트리트먼트","tube","#e8bfd8"],["샴푸","pump","#b9a3e3"],["주방세제","pump","#c7e48f"],["유연제","jug","#f4b8c8"],["청소용락스","jug","#cfe9d4"],["락스","jug","#dcecfa"],["세제","jug","#9fd3e6"],["수세미","scrub","#8fcf6a"],["스펀지","sponge","#ffe27a"],["치약","tube","#cfeefa"],["수분크림","pot","#cfeaf5"],["나이트크림","pot","#c4b5ea"],["썬크림","tube","#ffd666"],["립타투","tint","#f0707f"],["생리대","pad","#f7c1cf"],["디카페인","bag","#8fb3a0"],["말차가루","can","#a8d672"],["고춧가루","bag","#e8604c"],["고추장","tub","#d9503c"],["젓갈","jar","#e09a7a"],["햇반","rice","#ffc98a"],["낫또","cup","#e9d5a1"],["올리브","bottle","#b9cf6a"],["참기름","bottle","#c98a52"],["들기름","bottle","#c7b04a"],["간장","bottle","#a8724a"],["쯔유","bottle","#cf9a5c"],["마요네즈","squeeze","#fff4d6"],["케첩","squeeze","#ef6a5b"],["드레싱","squeeze","#bfe08a"],["잼","jar","#e8728a"],["버터","butter","#ffe27a"],["치즈","cheese","#fcd75a"],["또띠아","tortilla","#f3d9a4"],["감자","potato","#d9b27c"],["파프리카","paprika","#f47c5b"],["자몽","citrus","#f4a09a"],["사과","apple","#f28b82"],["블루베리","berry","#8f8fe0"],["흑마늘","garlic","#9b8590"],["우유","carton","#fffaf0"],["계란","egg","#f6dcb4"],["달걀","egg","#f6dcb4"],["두부","box","#fff6dc"],["요거트","cup","#fdf3f5"],["요구르트","cup","#fdf3f5"],["쌈","leaf","#8fcf6a"],["만두","dumpling","#fbe7c0"],["식빵","loaf","#f2c98a"],["쌀","bag","#f7ecd0"],["라면","bowl","#ffc9a0"],["커피","bag","#a97c5b"],["칫솔","stick","#9fd3c7"],["클리너","tube","#a8d672"]];
+const FB={"냉장":"bottle","냉동":"dumpling","식료품":"bag","생필품":"roll","청소용품":"tube"};
+const meta=i=>{const nm=i.name.replace(/\s/g,""),k=KW.find(k=>nm.includes(k[0]));return{sh:SHP[i.shape]?i.shape:(k?k[1]:FB[i.cat]),c:k?k[2]:PAL[hash(i.name)%8]}};
+const ico=(sh,c,m)=>{const [b,x,y]=SHP[sh];const mo=m==="s"?`M${x-3.5} ${y+7}q3.5-3.5 7 0`:m==="f"?`M${x-3} ${y+5}h6`:`M${x-3.5} ${y+4}q3.5 3.5 7 0`;
+ return`<svg viewBox="0 0 64 64" aria-hidden="true"><g stroke="${SK}" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round">${b.replace(/@/g,c)}</g><circle cx="${x-6}" cy="${y}" r="1.8" fill="${FC}"/><circle cx="${x+6}" cy="${y}" r="1.8" fill="${FC}"/><ellipse cx="${x-9.5}" cy="${y+3}" rx="2.4" ry="1.6" fill="#f08c8c" opacity=".45"/><ellipse cx="${x+9.5}" cy="${y+3}" rx="2.4" ry="1.6" fill="#f08c8c" opacity=".45"/><path d="${mo}" fill="none" stroke="${FC}" stroke-width="1.6" stroke-linecap="round"/></svg>`};
+const mood=i=>{const n=days(i.exp);return n!==null&&n<0&&i.qty>0?"s":(i.qty<1||isTidy(i))?"f":"h"};
+const icoOf=i=>{const m=meta(i);return ico(m.sh,m.c,mood(i))};
+/* ---------- panels ---------- */
+/* ---------- 아이콘 도감 ---------- */
+const LIBG=[["신선·유제품",["계란","우유","요거트","치즈","크림치즈","버터","생크림","두부","낫또","쌈"],"냉장"],["과일·채소",["블루베리","딸기","사과","자몽","바나나","감자","파프리카","흑마늘"],"냉장"],["곡물·빵·면",["쌀","햇반","라면","파스타","또띠아","식빵","만두"],"식료품"],["육류·수산",["닭가슴살","생선"],"냉동"],["소스·양념·기름",["간장","쯔유","마요네즈","케첩","드레싱","고추장","고춧가루","젓갈","잼","피넛버터","사과식초","올리브","참기름","들기름"],"식료품"],["커피·차",["커피","디카페인","말차가루"],"식료품"],["생필품",["휴지","비데휴지","키친타올","미용티슈","물티슈","주방물티슈","생리대","칫솔","치약"],"생필품"],["욕실·뷰티",["샴푸","트리트먼트","바디샴푸","바디비누","폼클렌저","클렌징오일","수분크림","나이트크림","썬크림","립타투"],"생필품"],["청소·세탁",["세제","주방세제","유연제","락스","청소용락스","수세미","스펀지","클리너"],"청소용품"]];
+const LIBN={"유연제":"섬유유연제","올리브":"올리브유","쌈":"쌈채소","클리너":"욕실 클리너","커피":"커피 원두"},LIBSKIP=["달걀","요구르트"],LMOOD=["h","f","s"];
+function libHTML(){
+ const tl=(sh,c,nm,p)=>`<button class="tile" data-lib="${sh}|${c}|0" aria-label="${esc(nm)}"><span class="ic" style="--p:${p}">${ico(sh,c,"h")}</span><span class="nm">${esc(nm)}</span></button>`;
+ let n=0,body;
+ if(ptab==="기본 모양"){const l=Object.keys(SHP);n=l.length;body=`<div class="tiles">${l.map(sh=>{const k=KW.find(k=>k[1]===sh);return tl(sh,k?k[2]:PAL[0],SHL[sh]||sh,CP["식료품"])}).join("")}</div>`}
+ else{const used=new Set([...LIBG.flatMap(g=>g[1]),...LIBSKIP]),rest=KW.map(k=>k[0]).filter(w=>!used.has(w)),gs=rest.length?[...LIBG,["기타",rest,"식료품"]]:LIBG;
+  body=gs.map(([t,ks,cp])=>{const l=ks.map(w=>KW.find(k=>k[0]===w)).filter(Boolean);n+=l.length;return`<div class="gh">${t}</div><div class="tiles">${l.map(k=>tl(k[1],k[2],LIBN[k[0]]||k[0],CP[cp])).join("")}</div>`}).join("")}
+ return`<div class="segs">${["품목","기본 모양"].map(c=>`<button class="seg" aria-pressed="${c===ptab}" data-seg="${c}">${c}</button>`).join("")}</div><div class="cap-t">${n}가지 · 눌러서 표정을 바꿔보세요</div>${body}`}
+
+const X='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>';
+const dd=i=>{const n=days(i.exp);return n!==null&&n<0&&i.qty>0?`<span class="dd x">D+${-n}</span>`:isTidy(i)?`<span class="dd">D-${n}</span>`:""};
+const tile=i=>`<button class="tile" data-edit="${i.id}" aria-label="${esc(i.name)}, ${i.qty}개">${dd(i)}<span class="qy ${i.qty<1?"z":""}">${i.qty}</span><span class="ic" style="--p:${CP[i.cat]}">${icoOf(i)}</span><span class="nm">${esc(i.name)}</span></button>`;
+const sheet=(t,b)=>`<div class="sheet"><div class="sh"><h2>${t}</h2><button class="cl" data-x aria-label="닫기">${X}</button></div>${b}</div>`;
+const emp=`<div class="emp">${ico("bowl","#e5dfd0","f")}</div>`;
+let ptab="전체";
+function statHTML(){const log=S.log.filter(l=>l.date>=d0(-90)),by={};log.forEach(l=>by[l.name]=(by[l.name]||0)+1);
+ const cc={};CATS.forEach(c=>cc[c]=0);log.forEach(l=>cc[l.cat]=(cc[l.cat]||0)+1);
+ const tot=log.length||1,cm=Math.max(...Object.values(cc),1),fr=(cc["냉장"]+cc["냉동"])/tot,hm=(cc["생필품"]+cc["청소용품"])/tot;
+ const P=log.length<5?["egg","기록 모으는 중"]:fr>.5?["leaf","신선파"]:hm>.35?["roll","살림파"]:["bag","비축파"];
+ const top=S.items.map(i=>({i,n:by[i.name]||0})).filter(r=>r.n).sort((a,b)=>b.n-a.n).slice(0,3);
+ return`<div class="big">${log.length}</div><div class="cap-t">최근 90일 장보기</div><div class="wh"><div class="caps">${CATS.map(c=>`<div class="cap"><div class="trk"><i style="height:${Math.max(16,cc[c]/cm*100)}%;background:${CAPC[c]};color:${CAPT[c]||"#fff"}">${Math.round(cc[c]/tot*100)}%</i></div>${c}</div>`).join("")}</div></div><div class="pers">${ico(P[0],"#ffe08a","h")}${P[1]}</div>${top.length?`<div class="rowt">${top.map(r=>`<div class="tile"><span class="qy">${r.n}</span><span class="ic" style="--p:${CP[r.i.cat]}">${icoOf(r.i)}</span><span class="nm">${esc(r.i.name)}</span></div>`).join("")}</div>`:""}`}
+function panelHTML(k){
+ if(UNITS[k]){const cs=UNITS[k].cs;
+  const l=S.items.filter(i=>cs.includes(i.cat)&&(ptab==="전체"||i.cat===ptab)).sort((a,b)=>cs.indexOf(a.cat)-cs.indexOf(b.cat));
+  return sheet(UNITS[k].t,`${cs.length>1?`<div class="segs">${["전체",...cs].map(c=>`<button class="seg" aria-pressed="${c===ptab}" data-seg="${c}">${c}</button>`).join("")}</div>`:""}${l.length?`<div class="tiles">${l.map(tile).join("")}</div>`:emp}`)}
+ if(k==="buy"){const l=S.items.filter(isBuy);return sheet("장보기",l.length?`<div class="tiles">${l.map(tile).join("")}</div><button class="cta" data-all>모두 구매 완료</button>`:emp)}
+ if(k==="lib")return sheet("아이콘 도감",libHTML());
+ return sheet("통계",statHTML())}
+/* ---------- UI ---------- */
+const bd=(id,n)=>{$(id).textContent=n;$(id).style.display=n?"":"none"};
+function render(){
+ $("qt").textContent=QUOTES[(Math.floor(Date.now()/864e5)+S.q)%QUOTES.length];
+ $("dateTx").textContent=new Date().toLocaleDateString("ko-KR",{month:"long",day:"numeric",weekday:"long"});
+ const t=S.items.filter(isTidy).sort((a,b)=>days(a.exp)-days(b.exp));
+ $("tray").innerHTML=t.map(i=>{const n=days(i.exp);return`<button class="chip" data-edit="${i.id}" aria-label="${esc(i.name)}"><span class="ci">${icoOf(i)}</span><span class="dd ${n<0?"x":""}">${n<0?"D+"+-n:"D-"+n}</span></button>`}).join("");
+ const lo=k=>S.items.filter(i=>UNITS[k].cs.includes(i.cat)&&isBuy(i)).length,fa=lo("fridge"),pa=lo("pantry"),sa=lo("supply");
+ bd("bF",fa);bd("bP",pa);bd("bS",sa);bd("bB",S.items.filter(isBuy).length);
+ $("tgF").innerHTML=fa?`<b>${fa}</b>`:"";$("tgP").innerHTML=pa?`<b>${pa}</b>`:"";$("tgS").innerHTML=sa?`<b>${sa}</b>`:"";
+ if(cur)$("ov").innerHTML=panelHTML(cur)}
+function show(k){if(cur!==k)ptab=k==="lib"?"품목":"전체";cur=k;if(!UNITS[k])setT(null);$("ov").hidden=false;$("ov").innerHTML=panelHTML(k)}
+function openUnit(k){setT(k);setTimeout(()=>show(k),480)}
+function closeP(){cur=null;$("ov").hidden=true;setT(null)}
+const buyIt=i=>{i.qty+=Math.max(1,i.min-i.qty);if(i.exp&&days(i.exp)<0)i.exp=null;S.log.push({name:i.name,cat:i.cat,date:d0(0)})};
+$("ov").addEventListener("click",e=>{
+ if(e.target.id==="ov"||e.target.closest("[data-x]")){closeP();return}
+ const sg=e.target.closest("[data-seg]");if(sg){ptab=sg.dataset.seg;render();return}
+ if(e.target.closest("[data-all]")){S.items.filter(isBuy).forEach(buyIt);save();render();return}
+ const lb=e.target.closest("[data-lib]");if(lb){const [sh,c,m]=lb.dataset.lib.split("|"),nx=(+m+1)%3;lb.dataset.lib=`${sh}|${c}|${nx}`;lb.querySelector(".ic").innerHTML=ico(sh,c,LMOOD[nx]);return}
+ const t=e.target.closest("[data-edit]");if(t)openDlg(S.items.find(i=>i.id==t.dataset.edit))});
+$("tray").addEventListener("click",e=>{const t=e.target.closest("[data-edit]");if(t)openDlg(S.items.find(i=>i.id==t.dataset.edit))});
+document.querySelectorAll("[data-nav]").forEach(b=>b.onclick=()=>{const k=b.dataset.nav;UNITS[k]?openUnit(k):show(k)});
+$("qt").onclick=()=>{S.q++;save();render()};
+$("libBtn").innerHTML=`<svg viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="28" fill="#ecdcc0" stroke="${SK}" stroke-width="2.2"/><circle cx="23" cy="30" r="2.6" fill="${FC}"/><circle cx="41" cy="30" r="2.6" fill="${FC}"/><ellipse cx="17" cy="37" rx="3.6" ry="2.4" fill="#f08c8c" opacity=".45"/><ellipse cx="47" cy="37" rx="3.6" ry="2.4" fill="#f08c8c" opacity=".45"/><path d="M27 38q5 5.5 10 0" fill="none" stroke="${FC}" stroke-width="2.2" stroke-linecap="round"/></svg>`;
+$("libBtn").onclick=()=>show("lib");
+$("fCat").innerHTML=CATS.map(c=>`<option value="${c}">${c}</option>`).join("");
+$("fShape").innerHTML='<option value="">자동 (이름으로)</option>'+Object.keys(SHL).map(k=>`<option value="${k}">${SHL[k]}</option>`).join("");
+const setQ=n=>{dq=Math.max(0,n);$("sQty").textContent=dq};
+$("sInc").onclick=()=>setQ(dq+1);$("sDec").onclick=()=>setQ(dq-1);
+function openDlg(it){editId=it?it.id:null;$("fShape").value=it?(it.shape||""):"";$("fName").value=it?it.name:"";$("fCat").value=it?it.cat:CATS[0];setQ(it?it.qty:1);$("fMin").value=it?it.min:1;$("fExp").value=it&&it.exp?it.exp:"";$("dDel").style.visibility=$("dBuy").style.visibility=it?"visible":"hidden";$("dlg").showModal()}
+$("addBtn").onclick=()=>openDlg(null);$("dCancel").onclick=()=>$("dlg").close();
+const read=()=>({name:$("fName").value.trim(),cat:$("fCat").value,qty:dq,min:Math.max(0,+$("fMin").value||0),exp:$("fExp").value||null,shape:$("fShape").value});
+$("dSave").onclick=()=>{const v=read();if(!v.name){$("fName").focus();return}if(editId)Object.assign(S.items.find(i=>i.id===editId),v);else S.items.push({id:S.next++,...v});save();$("dlg").close();render()};
+$("dBuy").onclick=()=>{const i=S.items.find(i=>i.id===editId);Object.assign(i,read());buyIt(i);save();$("dlg").close();render()};
+$("dDel").onclick=()=>{S.items=S.items.filter(i=>i.id!==editId);save();$("dlg").close();render()};
+/* ---------- 3D kitchen ---------- */
+const TG={fridge:0,pantry:0,supply:0},CU={fridge:0,pantry:0,supply:0};
+function setT(k){for(const u in TG)TG[u]=u===k?1:0}
+const R=new THREE.WebGLRenderer({canvas:$("cv"),antialias:true,alpha:true});R.shadowMap.enabled=true;R.shadowMap.type=THREE.PCFSoftShadowMap;
+const sc=new THREE.Scene(),cam=new THREE.OrthographicCamera(-1,1,1,-1,.1,100);cam.position.set(10,9,10);
+function fit(){const w=innerWidth,h=innerHeight,a=w/h,vh=Math.max(12,15/a);R.setPixelRatio(Math.min(devicePixelRatio,2));R.setSize(w,h);cam.left=-vh*a/2;cam.right=vh*a/2;cam.top=vh/2;cam.bottom=-vh/2;cam.updateProjectionMatrix();cam.lookAt(0,.3,0)}
+addEventListener("resize",fit);fit();
+sc.add(new THREE.HemisphereLight(0xfff1d6,0xc89a6a,.9));
+const dl=new THREE.DirectionalLight(0xffe2b0,.75);dl.position.set(5,12,7);dl.castShadow=true;dl.shadow.mapSize.set(1024,1024);Object.assign(dl.shadow.camera,{left:-8,right:8,top:8,bottom:-8,far:40});sc.add(dl);
+const mat=c=>new THREE.MeshStandardMaterial({color:c,roughness:.75});
+function put(p,m,x,y,z){m.position.set(x,y,z);m.castShadow=m.receiveShadow=true;p.add(m);return m}
+function rb(w,h,d,r,c){const s=new THREE.Shape(),x=-w/2,y=-h/2;s.moveTo(x+r,y);s.lineTo(x+w-r,y);s.quadraticCurveTo(x+w,y,x+w,y+r);s.lineTo(x+w,y+h-r);s.quadraticCurveTo(x+w,y+h,x+w-r,y+h);s.lineTo(x+r,y+h);s.quadraticCurveTo(x,y+h,x,y+h-r);s.lineTo(x,y+r);s.quadraticCurveTo(x,y,x+r,y);
+ const g=new THREE.ExtrudeGeometry(s,{depth:d-.1,bevelEnabled:true,bevelThickness:.05,bevelSize:.05,bevelSegments:2,curveSegments:4});g.translate(0,0,-(d-.1)/2);return new THREE.Mesh(g,mat(c))}
+const cyl=(a,b,h,c)=>new THREE.Mesh(new THREE.CylinderGeometry(a,b,h,24),mat(c));
+const sph=(r,c)=>new THREE.Mesh(new THREE.SphereGeometry(r,16,12),mat(c));
+/* room */
+const slab=put(sc,new THREE.Mesh(new THREE.BoxGeometry(7.2,.5,7.2),mat("#b9835a")),0,-.25,0);
+const cv2=document.createElement("canvas");cv2.width=cv2.height=256;const cx=cv2.getContext("2d");for(let i=0;i<8;i++)for(let j=0;j<8;j++){cx.fillStyle=(i+j)%2?"#efe6d4":"#e4d6bd";cx.fillRect(i*32,j*32,32,32)}
+const tx=new THREE.CanvasTexture(cv2);const fl=new THREE.Mesh(new THREE.PlaneGeometry(7,7),new THREE.MeshStandardMaterial({map:tx,roughness:.9}));fl.rotation.x=-Math.PI/2;fl.position.y=.01;fl.receiveShadow=true;sc.add(fl);
+put(sc,new THREE.Mesh(new THREE.BoxGeometry(7.2,4.8,.3),mat("#f6ead3")),0,2.4,-3.55);
+put(sc,new THREE.Mesh(new THREE.BoxGeometry(.3,4.8,7.2),mat("#efe0c3")),-3.55,2.4,0);
+put(sc,new THREE.Mesh(new THREE.BoxGeometry(6.9,.35,.12),mat("#d29a5e")),0,.18,-3.38);
+put(sc,new THREE.Mesh(new THREE.BoxGeometry(.12,.35,6.9)),-3.38,.18,0).material=mat("#c88c52");
+/* wall deco: round clock + window */
+const clk=cyl(.5,.5,.1,"#fffaf0");clk.rotation.x=Math.PI/2;put(sc,clk,-1,4.2,-3.35);
+const win=rb(2,1.6,.12,.1,"#bfe3f2");put(sc,win,-3.4,3.4,-1.8).rotation.y=Math.PI/2;
+/* fridge */
+const F=new THREE.Group();F.position.set(1.9,0,-2.6);sc.add(F);
+put(F,rb(2.2,4.2,1.8,.15,"#b6cf86"),0,2.1,0);put(F,rb(2,3.9,.1,.05,"#f4fbf9"),0,2.1,.93);
+[1.2,2.1,3].forEach(y=>put(F,rb(1.9,.07,.5,.03,"#dfe9c5"),0,y,1.1));
+const FD=new THREE.Group();FD.position.set(-1.1,2.1,1);F.add(FD);put(FD,rb(2.15,4,.22,.12,"#b6cf86"),1.07,0,0);put(FD,rb(.12,1.2,.14,.05,"#fff"),1.85,.4,.17);
+/* pantries: 식료품 (냉장고 옆, 뒤쪽 벽) + 생필품/청소용품 (왼쪽 벽 맨 끝, 폭 0.7배) */
+function mkPantry(x,z,ry,c,wf=1){
+ const w=v=>v*wf,G=new THREE.Group();G.position.set(x,0,z);G.rotation.y=ry;sc.add(G);
+ put(G,rb(w(3.4),3.4,1.6,.1,c[0]),0,1.7,0);put(G,rb(w(3.6),.16,1.8,.06,c[1]),0,3.48,0);put(G,rb(w(3.1),1.55,.1,.05,"#fff3d6"),0,2.55,.84);
+ [2.15,2.95].forEach(y=>put(G,rb(w(3),.07,.5,.03,c[2]),0,y,.98));
+ const L=new THREE.Group(),Rg=new THREE.Group();L.position.set(w(-1.7),2.55,.9);Rg.position.set(w(1.7),2.55,.9);G.add(L,Rg);
+ put(L,rb(w(1.65),1.55,.16,.06,"#fff3d6"),w(.83),0,0);put(L,sph(.07,c[3]),w(1.5),0,.12);put(Rg,rb(w(1.65),1.55,.16,.06,"#fff3d6"),w(-.83),0,0);put(Rg,sph(.07,c[3]),w(-1.5),0,.12);
+ const DR=[1.15,.4].map(y=>{const d=new THREE.Group();d.position.set(0,y,.9);G.add(d);put(d,rb(w(3.1),.72,.2,.06,c[2]),0,0,0);put(d,sph(.09,c[4]),0,0,.14);return d});
+ return{G,L,Rg,DR}}
+const PA=mkPantry(-1.1,-2.6,0,["#d9a066","#b57d45","#e7b277","#b57d45","#8a5a2e"]);
+const PB=mkPantry(-2.7,2.31,Math.PI/2,["#9cc5b4","#7ba897","#bcdccf","#6e9486","#4f7466"],.7);
+/* table + vase(후마타고사리) : 가장 아래쪽 모서리 */
+const T=new THREE.Group();T.position.set(1.95,0,1.95);sc.add(T);
+put(sc,cyl(1.5,1.5,.03,"#f7efe0"),1.95,.03,1.95);
+put(T,cyl(1.1,1.1,.14,"#f3e2c0"),0,1.45,0);put(T,cyl(.12,.12,1.4,"#d29a5e"),0,.75,0);put(T,cyl(.5,.55,.1,"#b57d45"),0,.05,0);
+put(T,cyl(.2,.26,.5,"#7db8e8"),0,1.77,0);
+const vec=(x,y,z)=>new THREE.Vector3(x,y,z),FG=new THREE.SphereGeometry(1,8,6),FMt=[mat("#4f9a5a"),mat("#6dba7c"),mat("#8bd08e")],STM=mat("#7d8a45"),RHM=mat("#efe2c2"),RHF=mat("#fff6e0");
+function frond(phi,L,sp,k){
+ const rx=Math.cos(phi),rz=Math.sin(phi),n0=vec(-rz,0,rx);
+ const pt=t=>vec(rx*(.1+L*sp*t),2.02+L*(1.5*t-k*t*t),rz*(.1+L*sp*t)),tg=t=>vec(rx*L*sp,L*(1.5-2*k*t),rz*L*sp).normalize();
+ T.add(new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3([0,.2,.4,.6,.8,1].map(pt)),14,.013,5),STM));
+ const N=6;
+ for(let j=0;j<N;j++){
+  const t=.2+.75*j/(N-1),p=pt(t),tt=tg(t),up=n0.clone().cross(tt).normalize(),ln=L*(.3-.21*j/(N-1));
+  [-1,1].forEach(sd=>{
+   const X=n0.clone().multiplyScalar(sd).add(tt.clone().multiplyScalar(.5)).normalize();
+   const Y=up.clone().sub(X.clone().multiplyScalar(up.dot(X))).normalize(),Z=new THREE.Vector3().crossVectors(X,Y);
+   const q=new THREE.Quaternion().setFromRotationMatrix(new THREE.Matrix4().makeBasis(X,Y,Z));
+   [[.3,.3,1],[.68,.3,.82],[1.05,.24,.6]].forEach(([d,a,w],m)=>{
+    const lm=new THREE.Mesh(FG,FMt[(j+m)%3]);lm.position.copy(p).add(X.clone().multiplyScalar(ln*d));lm.quaternion.copy(q);lm.scale.set(ln*a,.02,ln*.36*w);T.add(lm)})})}
+ const tip=new THREE.Mesh(FG,FMt[0]);tip.position.copy(pt(1.02));tip.scale.set(.05,.02,.035);T.add(tip)}
+[[.2,.92,.78,1],[1.1,.83,.72,1],[2,.99,.8,1.05],[2.9,.8,.7,.95],[3.8,.94,.78,1],[4.6,.85,.74,1],[5.5,.97,.8,1.05],[.9,.71,.35,.6],[3.3,.76,.3,.55],[5.2,.67,.32,.6]].forEach(a=>frond(...a));
+/* 털 달린 뿌리줄기(토끼발) */
+[.6,1.9,3.1,4.3,5.5].forEach((phi,i)=>{
+ const rx=Math.cos(phi),rz=Math.sin(phi);
+ for(let u=0;u<=1.001;u+=1/7){
+  const r=(1-u)*(1-u)*.16+2*u*(1-u)*.46+u*u*.33,y=(1-u)*(1-u)*2.05+2*u*(1-u)*2.08+u*u*1.62,rad=.062-.02*u;
+  const m=new THREE.Mesh(FG,RHM);m.position.set(rx*r,y,rz*r);m.scale.setScalar(rad);T.add(m);
+  const f=new THREE.Mesh(FG,RHF);f.position.set(rx*(r+.03)-rz*.02*(i%2?1:-1),y+.02,rz*(r+.03)+rx*.02*(i%2?1:-1));f.scale.setScalar(rad*.6);T.add(f)}});
+/* interaction */
+const ray=new THREE.Raycaster(),m2=new THREE.Vector2();
+function pick(e){m2.set(e.clientX/innerWidth*2-1,-(e.clientY/innerHeight)*2+1);ray.setFromCamera(m2,cam);const h=ray.intersectObjects([F,PA.G,PB.G],true);if(!h.length)return null;let o=h[0].object;while(o&&o!==F&&o!==PA.G&&o!==PB.G)o=o.parent;return o===F?"fridge":o===PA.G?"pantry":"supply"}
+$("cv").addEventListener("click",e=>{const k=pick(e);if(k)openUnit(k)});
+$("cv").addEventListener("pointermove",e=>{$("cv").style.cursor=pick(e)?"pointer":"default"});
+const v=new THREE.Vector3();function tag(el,x,y,z){v.set(x,y,z).project(cam);el.style.left=(v.x+1)/2*innerWidth+"px";el.style.top=(1-v.y)/2*innerHeight+"px"}
+(function loop(){requestAnimationFrame(loop);
+ for(const u in TG)CU[u]+=(TG[u]-CU[u])*.12;FD.rotation.y=-1.9*CU.fridge;
+ [["pantry",PA],["supply",PB]].forEach(([u,p])=>{p.L.rotation.y=-1.9*CU[u];p.Rg.rotation.y=1.9*CU[u];p.DR.forEach(d=>d.position.z=.9+.9*CU[u])});
+ tag($("tgF"),1.9,4.6,-2.2);tag($("tgP"),-1.1,3.9,-2.2);tag($("tgS"),-2.4,3.9,2.31);R.render(sc,cam)})();
+render();
+</script>
+</body>
+</html>
