@@ -11,7 +11,7 @@ self.addEventListener("fetch", e => {
   const r = e.request;
   if (r.method !== "GET") return;
   const u = new URL(r.url);
-  if (u.hostname.includes("openfoodfacts")) return;               // 상품 조회는 항상 네트워크
+  if (/open(food|beauty|products)facts/.test(u.hostname)) return;               // 상품 조회는 항상 네트워크
   const put = x => { if (x && (x.ok || x.type === "opaque")) { const cp = x.clone(); caches.open(V).then(c => c.put(r, cp)); } return x; };
   if (u.origin === location.origin) {                              // 내 파일: 온라인이면 최신, 오프라인이면 캐시
     e.respondWith(fetch(r).then(put).catch(() => caches.match(r).then(m => m || caches.match("index.html"))));

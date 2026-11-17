@@ -89,6 +89,7 @@ dialog input,dialog select{width:100%;border:0;border-radius:16px;background:#ff
 .snap span{color:var(--mut)}
 .bcb{position:absolute;top:16px;right:16px;width:46px;height:46px;border-radius:14px;border:0;background:#fff;display:grid;place-items:center;color:var(--ink)}
 .bcb svg{width:26px;height:26px}
+.msg a{color:var(--br);font-weight:800}
 .msg{min-height:18px;margin:10px 2px 0;font-size:13px;color:var(--br);font-weight:600}
 #toast{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 124px);transform:translate(-50%,10px);background:var(--ink);color:#fff;padding:10px 18px;border-radius:999px;font-size:14px;font-weight:600;opacity:0;pointer-events:none;transition:.25s;z-index:30;max-width:92vw;text-align:center}
 #toast.on{opacity:1;transform:translate(-50%,0)}
@@ -331,7 +332,9 @@ $("impMerge").onclick=()=>{preSnap();mergeIn(pend);save();pend=null;$("impDlg").
 /* 바코드 (스캐너 코드는 scanner.js에 분리) */
 const guessCat=n=>{const g=LIBG.find(g=>g[1].some(w=>n.includes(w)));return g?g[2]:null};
 const loadScanner=()=>window.PantryScanner?Promise.resolve():new Promise((ok,no)=>{const e=document.createElement("script");e.src="scanner.js";e.onload=ok;e.onerror=no;document.head.appendChild(e)});
-async function lookupBC(c){try{const ct=new AbortController(),t=setTimeout(()=>ct.abort(),6000),r=await fetch("https://world.openfoodfacts.org/api/v2/product/"+encodeURIComponent(c)+".json?fields=product_name,product_name_ko",{signal:ct.signal});clearTimeout(t);const j=await r.json(),p=j&&j.product;return p?(p.product_name_ko||p.product_name||"").trim():""}catch(e){return ""}}
+async function lookupBC(c){const hosts=["world.openfoodfacts.org","world.openbeautyfacts.org","world.openproductsfacts.org"];
+ const one=async h=>{try{const ct=new AbortController(),t=setTimeout(()=>ct.abort(),6000),r=await fetch("https://"+h+"/api/v2/product/"+encodeURIComponent(c)+".json?fields=product_name,product_name_ko,generic_name",{signal:ct.signal});clearTimeout(t);const j=await r.json(),p=j&&j.product;return p?(p.product_name_ko||p.product_name||p.generic_name||"").trim():""}catch(e){return ""}};
+ return(await Promise.all(hosts.map(one))).find(x=>x)||""}
 async function onScan(code){
  const ex=S.items.find(i=>i.bc===code);
  if(ex){setForm(ex);setQ(ex.qty+1);$("dMsg").textContent="이미 있는 물건이에요 · 수량 +1 (저장하면 반영돼요)";return}
@@ -340,7 +343,8 @@ async function onScan(code){
  $("dMsg").textContent="상품 정보를 찾는 중…";
  const nm=await lookupBC(code);
  if(nm&&!$("fName").value.trim()){$("fName").value=nm.slice(0,20);const c=guessCat(nm);if(c)$("fCat").value=c;$("dMsg").textContent="상품명을 채웠어요. 확인 후 저장해 주세요."}
- else $("dMsg").textContent=nm?"바코드를 입력했어요.":"상품명을 찾지 못했어요. 이름을 입력해 주세요."}
+ else if(nm)$("dMsg").textContent="바코드를 입력했어요.";
+ else $("dMsg").innerHTML='상품명을 찾지 못했어요. 이름을 입력해 주세요. <a href="https://m.search.naver.com/search.naver?query='+esc(code)+'" target="_blank" rel="noopener">네이버에서 검색</a>'}
 $("bcBtn").onclick=async()=>{try{await loadScanner()}catch(e){$("dMsg").textContent="scanner.js 파일을 불러오지 못했어요.";return}PantryScanner.open(onScan)};
 /* ---------- 3D kitchen ---------- */
 const TG={fridge:0,pantry:0,supply:0},CU={fridge:0,pantry:0,supply:0};
